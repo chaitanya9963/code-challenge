@@ -1,0 +1,28 @@
+class RecentlyPlayedStore:
+    def __init__(self, capacity, user_song_pairs=None):
+        self.capacity = capacity
+        self.user_song_pairs = user_song_pairs or {}
+    
+    def add_song(self, user, song):
+        if user not in self.user_song_pairs:
+            self.user_song_pairs[user] = []
+        if song in self.user_song_pairs[user]:
+            self.user_song_pairs[user].remove(song)
+        self.user_song_pairs[user].insert(0, song)
+        if len(self.user_song_pairs[user]) > self.capacity:
+            self.user_song_pairs[user] = self.user_song_pairs[user][:self.capacity]
+    
+    def get_recently_played(self, user):
+        return self.user_song_pairs.get(user, [])
+store = RecentlyPlayedStore(3)
+store.add_song("user1", "S1")
+store.add_song("user1", "S2")
+store.add_song("user1", "S3")
+assert store.get_recently_played("user1") == ["S3", "S2", "S1"]
+store.add_song("user1", "S4")
+assert store.get_recently_played("user1") == ["S4", "S3", "S2"]
+store.add_song("user1", "S2")
+assert store.get_recently_played("user1") == ["S2", "S4", "S3"]
+store.add_song("user1", "S1")
+assert store.get_recently_played("user1") == ["S1", "S2", "S4"]
+
